@@ -152,11 +152,11 @@ function showFeedback(success, note) {
 function updateStatus() {
     // 1. 計算玩家稱號
     let rank = '剛出爐的吐司';
-    if (state.level >= 10) rank = '半桶水專家';
-    if (state.level >= 20) rank = '連 Wi-Fi 都連不上的人';
-    if (state.level >= 30) rank = '睡覺也能思考的人';
-    if (state.level >= 40) rank = '咖啡永遠不夠的人';
-    if (state.level >= 50) rank = '神秘消失術大師';
+    if (state.level >= 3) rank = '半桶水專家';
+    if (state.level >= 6) rank = '連 Wi-Fi 都連不上的人';
+    if (state.level >= 9) rank = '睡覺也能思考的人';
+    if (state.level >= 12) rank = '咖啡永遠不夠的人';
+    if (state.level >= 15) rank = '神秘消失術大師';
 
     // 2. 更新文字顯示
     // 左上角：顯示目前的關卡數
@@ -174,29 +174,30 @@ function updateStatus() {
     let icon = '🥚';
     let text = '孵化中...';
 
-    if (state.level >= 5) { icon = '🥚'; text = '破殼而出'; }
-    if (state.level >= 10) { icon = '🦕'; text = '幼年期'; }
-    if (state.level >= 20) { icon = '🦅'; text = '青年期'; }
-    if (state.level >= 30) { icon = '🐊'; text = '成熟期'; }
-    if (state.level >= 40) { icon = '🦖'; text = '老年期'; }
-    if (state.level >= 50) { icon = '🐉'; text = '靈魂昇華'; }
-    if (state.level >= 60) { icon = '🐲'; text = '成為天使'; }
+    if (state.level >= 3) { icon = '🦎'; text = '破殼而出'; }
+    if (state.level >= 6) { icon = '🦖'; text = '幼年期'; }
+    if (state.level >= 9) { icon = '🦕'; text = '青年期'; }
+    if (state.level >= 12) { icon = '🐊'; text = '成熟期'; }
+    if (state.level >= 15) { icon = '🦖'; text = '老年期'; }
+    if (state.level >= 18) { icon = '🐉'; text = '靈魂昇華'; }
+    if (state.level >= 21) { icon = '🐲'; text = '成為天使'; }
 
     // ✨ 心情覆蓋 (如果開心或受傷，暫時改變表情) ✨
     if (state.petMood === 'happy') {
         // 開心時加愛心或笑臉
-        if (state.level < 5) icon = '✨🥚✨'; 
-        else if (state.level < 10) icon = '🦕❤️';
-        else if (state.level < 20) icon = '🦎🎵';
-        else icon += '🥰'; 
+        if (state.level < 3) icon = '✨🥗✨'; 
+        else if (state.level < 6) icon = '❤️🌮❤️';
+        else if (state.level < 9) icon = '🎵🍔🎵';
+        else icon += '🍱'; 
     } 
     else if (state.petMood === 'hurt') {
         // 受傷時變暈眩或受傷
-        if (state.level < 5) icon = '🥚💥';
-        else if (state.level < 10) icon = '🦕🔥';
-        else icon = '👾'; 
+        if (state.level < 3) icon = '🗡️💥';
+        else if (state.level < 6) icon = '🐛🍂';
+        else icon = '🦴👾🦴'; 
     }
 
     petAvatar.innerText = icon;
     petStatus.innerText = `階段：${text}`;
 }
+
