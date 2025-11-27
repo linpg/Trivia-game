@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>原子計畫：無限進化</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-shell">
+        <!-- 頭部狀態列 -->
+        <div class="header">
+            <div class="status-bar">
+                <span id="level-title">關卡 1</span>
+                <span id="xp-display">LV.1 | XP: 0/100</span>
+            </div>
+            <div class="progress-track">
+                <div id="xp-bar-fill" class="progress-fill"></div>
+            </div>
+        </div>
+
+        <!-- 遊戲主舞台 -->
+        <div id="game-stage">
+            <div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #94a3b8;">
+                <p>載入中...</p>
+            </div>
+        </div>
+
+        <!-- 結算彈窗 -->
+        <div id="feedback"></div>
+    </div>
+
+    <!-- 載入邏輯 -->
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
