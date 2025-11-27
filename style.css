@@ -4,7 +4,6 @@
     --primary: #6366f1;
     --success: #10b981;
     --danger: #ef4444;
-    --warning: #f59e0b;
     --bg: #f8fafc;
     --card: #ffffff;
     --text: #1e293b;
@@ -38,24 +37,50 @@ body {
 /* Header */
 .header {
     background: var(--primary);
-    padding: 24px;
+    padding: 20px 24px; /* 稍微縮小一點給寵物騰空間 */
     color: white;
     border-radius: 0 0 24px 24px;
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
     transition: background 0.3s;
+    z-index: 10;
 }
 .header.boss-mode { background: var(--danger); }
 .status-bar { display: flex; justify-content: space-between; align-items: end; margin-bottom: 8px; }
-#level-title { font-size: 1.5rem; font-weight: 900; margin: 0; }
+#level-title { font-size: 1.2rem; font-weight: 900; margin: 0; }
 .progress-track { background: rgba(0,0,0,0.2); height: 6px; border-radius: 3px; overflow: hidden; }
 .progress-fill { background: #fbbf24; height: 100%; width: 0%; transition: width 0.5s; }
 
+/* ✨ 寵物展示區 ✨ */
+#pet-container {
+    text-align: center;
+    padding: 20px 0 10px 0;
+    background: linear-gradient(to bottom, #f1f5f9, #ffffff);
+    border-bottom: 1px solid #e2e8f0;
+}
+#pet-avatar {
+    font-size: 5rem;
+    line-height: 1;
+    margin-bottom: 5px;
+    animation: breathe 3s infinite ease-in-out;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.5s;
+}
+#pet-status {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: bold;
+    background: #e2e8f0;
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
 /* Game Stage */
 #game-stage { flex: 1; padding: 24px; display: flex; flex-direction: column; justify-content: center; overflow-y: auto; }
-.mode-icon { font-size: 4rem; text-align: center; margin-bottom: 16px; animation: bounceIn 0.5s; }
+.mode-icon { font-size: 3rem; text-align: center; margin-bottom: 16px; animation: bounceIn 0.5s; opacity: 0.8; }
 .q-text { font-size: 1.2rem; font-weight: 700; color: var(--text); text-align: center; margin-bottom: 24px; line-height: 1.5; }
 
-/* Common Buttons */
+/* Options */
 .options-grid { display: grid; gap: 12px; }
 .btn-opt {
     background: #f1f5f9; border: 2px solid transparent; padding: 16px;
@@ -63,36 +88,6 @@ body {
     font-weight: 600; cursor: pointer; text-align: left; transition: 0.2s;
 }
 .btn-opt:active { transform: scale(0.98); background: #e2e8f0; }
-
-/* 真假判断专用 */
-.tf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.btn-tf { padding: 30px; font-size: 2rem; border-radius: 20px; border: none; cursor: pointer; }
-.btn-true { background: #dcfce7; color: #166534; }
-.btn-false { background: #fee2e2; color: #991b1b; }
-
-/* 排序游戏专用 */
-.sort-container { display: flex; flex-direction: column; gap: 10px; }
-.sort-slot { 
-    background: #f8fafc; border: 2px dashed #cbd5e1; padding: 15px; 
-    border-radius: 12px; text-align: center; font-weight: bold; color: #64748b; min-height: 24px;
-}
-.sort-slot.filled { background: #e0e7ff; border-style: solid; border-color: #818cf8; color: #3730a3; }
-
-/* 数独/九宫格专用 */
-.sudoku-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; 
-    background: #475569; padding: 5px; border-radius: 10px; width: fit-content; margin: 0 auto 20px auto;
-}
-.sudoku-cell {
-    width: 60px; height: 60px; background: white; 
-    display: flex; align-items: center; justify-content: center; 
-    font-size: 1.5rem; font-weight: bold; border-radius: 5px;
-}
-.sudoku-cell.empty { background: #fbbf24; color: white; animation: pulse 1.5s infinite; }
-
-/* Emoji 方程式 */
-.emoji-eq-row { display: flex; justify-content: center; align-items: center; gap: 10px; font-size: 1.5rem; margin-bottom: 10px; }
-.emoji-eq-box { background: #fffbeb; padding: 15px; border-radius: 15px; border: 2px solid #fcd34d; margin-bottom: 20px; }
 
 /* Feedback */
 #feedback {
@@ -108,6 +103,40 @@ body {
 }
 
 /* Animations */
-@keyframes bounceIn { 0% { transform: scale(0); } 60% { transform: scale(1.1); } 100% { transform: scale(1); } }
-@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+/* Animations */
+@keyframes breathe { 
+    0%, 100% { transform: scale(1); } 
+    50% { transform: scale(1.05); } 
+}
+@keyframes bounceIn { 
+    0% { transform: scale(0); } 
+    60% { transform: scale(1.1); } 
+    100% { transform: scale(1); } 
+}
+@keyframes slideUp { 
+    from { transform: translateY(100%); } 
+    to { transform: translateY(0); } 
+}
+
+/* ✨ 新增：開心跳躍 ✨ */
+@keyframes jump-happy {
+    0% { transform: translateY(0) scale(1); }
+    25% { transform: translateY(-20px) scale(1.1); }
+    50% { transform: translateY(0) scale(1); }
+    75% { transform: translateY(-10px) scale(1.05); }
+    100% { transform: translateY(0) scale(1); }
+}
+
+/* ✨ 新增：受傷顫抖 ✨ */
+@keyframes shake-hurt {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-10px) rotate(-5deg); }
+    50% { transform: translateX(10px) rotate(5deg); }
+    75% { transform: translateX(-10px) rotate(-5deg); }
+    100% { transform: translateX(0); }
+}
+
+/* 用來套用動畫的 class */
+.pet-happy { animation: jump-happy 0.8s ease-in-out !important; }
+.pet-hurt { animation: shake-hurt 0.5s ease-in-out !important; }
+

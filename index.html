@@ -3,20 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>原子計畫：無限進化</title>
+    <title>原子計畫：生命進化論</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-shell">
-        <!-- 頭部狀態列 -->
+         <!-- 頭部狀態列 -->
         <div class="header">
             <div class="status-bar">
-                <span id="level-title">關卡 1</span>
-                <span id="xp-display">LV.1 | XP: 0/100</span>
+                <!-- 左邊顯示關卡數 (字稍微大一點) -->
+                <span id="level-title" style="font-size: 1.2rem;">第 1 關</span>
+                
+                <!-- 右邊顯示稱號與等級 (字稍微小一點) -->
+                <span id="xp-display" style="font-size: 0.9rem; opacity: 0.9;">新手村村民 LV.1</span>
             </div>
             <div class="progress-track">
                 <div id="xp-bar-fill" class="progress-fill"></div>
             </div>
+        </div>
+
+        <!-- ✨ 新增：寵物進化展示區 ✨ -->
+        <div id="pet-container">
+            <div id="pet-avatar">🥚</div>
+            <div id="pet-status">生命階段：神秘的蛋</div>
         </div>
 
         <!-- 遊戲主舞台 -->
