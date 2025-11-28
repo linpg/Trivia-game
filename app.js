@@ -136,7 +136,7 @@ function showGameEnd(success) {
         <div style="font-size:3rem">${emoji}</div>
         <h3>遊戲結束！升到 LV.${state.level}</h3>
         <p>${message}</p>
-        <button class="btn-next" onclick="loadNewLevel()">重新開始 🔄</button>
+        <button class="btn-next" onclick="loadNewLevel()">都答對了！再來啊！</button>
     `;
 }
 
@@ -214,4 +214,5 @@ function getRank(level) {
     if (level >= 3) return '半桶水專家';
     return '剛出爐的吐司';
 }
+
 
