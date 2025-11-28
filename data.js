@@ -175,7 +175,7 @@ function getNextLevel(levelNum, usedIds = []) {
     
     if (available.length === 0) {
         // 題目用光了，回傳重置關卡
-        return { mode: 'quiz', id: levelNum, q: "恭喜！所有題庫已答完！", options: ["重置並重新開始"], a: 0, note: "你真是博學多聞！", reset: true };
+        return { mode: 'quiz', id: levelNum, q: "恭喜！等我更新題目吧！", options: ["重置並重新開始"], a: 0, note: "你把題目都挖完了！", reset: true };
     }
 
     const index = Math.floor(Math.random() * available.length);
@@ -187,3 +187,4 @@ function generateBossLevel(id) {
     let shuffled = [...triviaDB].sort(()=>Math.random()-0.5);
     return { mode: 'boss', id, questions: shuffled.slice(0,5), note: "Boss 擊破！" };
 }
+
