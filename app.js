@@ -149,7 +149,7 @@ function showGameEnd(success) {
     playSound('levelup');
     const emoji = state.sessionCorrect === 3 ? '🏆' : '🎉';
     const message = state.sessionCorrect === 3 
-        ? `3 都答對了！再試啊！`
+        ? `哎吆不錯哦！`
         : `答對 ${state.sessionCorrect} / 3`;
 
     const fb = document.getElementById('feedback');
@@ -297,5 +297,6 @@ function getRank(level) {
     if (level >= 3) return '半桶水專家';
     return '剛出爐的吐司';
 }
+
 
 
