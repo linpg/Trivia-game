@@ -72,8 +72,9 @@ function renderQuestion(container) {
 function checkAns(user, ans) {
     const q = state.currentSession[state.sessionProgress];
     
-    if(user === ans) {
+      if(user === ans) {
         // 答對：寵物開心
+        playSound('correct'); // ✨ 加這一行
         setPetMood('happy');
         state.sessionCorrect++;
         
@@ -100,7 +101,9 @@ function checkAns(user, ans) {
         }
         
     } else {
+       } else {
         // 答錯
+        playSound('wrong'); // ✨ 加這一行
         setPetMood('hurt');
         
         setTimeout(() => {
@@ -125,6 +128,7 @@ function setPetMood(mood) {
 
 // ✨ 新增：遊戲結束畫面
 function showGameEnd(success) {
+    playSound('levelup'); // ✨ 加這一行
     const emoji = state.sessionCorrect === 3 ? '🏆' : '🎉';
     const message = state.sessionCorrect === 3 
         ? `3 都答對了！再試啊！`
@@ -213,6 +217,61 @@ function getRank(level) {
     if (level >= 6) return '連 Wi-Fi 都連不上的人';
     if (level >= 3) return '半桶水專家';
     return '剛出爐的吐司';
+}
+
+// ✨ 音效系統
+function playSound(type) {
+    // 檢查瀏覽器是否支持 Web Audio API
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
+    if (type === 'correct') {
+        // 答對音效 - 開心的音調
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        osc.frequency.setValueAtTime(800, audioContext.currentTime);
+        osc.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gain.gain.setValueAtTime(0, audioContext.currentTime + 0.2);
+        
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.2);
+    }
+    
+    else if (type === 'wrong') {
+        // 答錯音效 - 低沉的音調
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        osc.frequency.setValueAtTime(400, audioContext.currentTime);
+        osc.frequency.setValueAtTime(300, audioContext.currentTime + 0.1);
+        gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gain.gain.setValueAtTime(0, audioContext.currentTime + 0.2);
+        
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.2);
+    }
+    
+    else if (type === 'levelup') {
+        // 升級音效 - 歡樂上升的音調
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(audioContext.destination);
+        
+        osc.frequency.setValueAtTime(600, audioContext.currentTime);
+        osc.frequency.setValueAtTime(900, audioContext.currentTime + 0.15);
+        osc.frequency.setValueAtTime(1200, audioContext.currentTime + 0.3);
+        gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+        gain.gain.setValueAtTime(0, audioContext.currentTime + 0.4);
+        
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.4);
+    }
 }
 
 
