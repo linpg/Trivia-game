@@ -9,17 +9,14 @@ let state = {
     soundEnabled: JSON.parse(localStorage.getItem('atomic_sound') || 'true') // 音效開關
 };
 
-// ✨ 進階玩法：隨機辣妹/慶祝 GIF 列表
+// 隨機辣妹/慶祝 GIF 列表
 const danceGifs = [
-    "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif", // 復古迪斯可
-    "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExczhrazZycGM5MG9vdGJteG00aWp0cjhpaG40eGplcmhyZ205MTF6ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/EbaEWv3icphQI/giphy.gif", // 歡呼
-    "https://media.giphy.com/media/l2JIdnF6aJcNqyJXq/giphy.gif", // 派對
-    "https://media.giphy.com/media/blSTtZehjAZ8I/giphy.gif",     // 碧昂絲
-    "https://media.giphy.com/media/11u7t453jrQxY4/giphy.gif",     // 啦啦隊
-    "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExd3M1c2J4czRsb21qMHdkMDFmNHF1Nmc2cmU1Y3BuMzhjbmgxNTMzbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4j9XOYo6IVDK8/giphy.gif",  
-    "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2ZhMWZ2M24zMmFja2pwNTJhN2x3cDE0djFqZDh6dXFya2FkeTJncyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3UkqVq3F50bVCi9URl/giphy.gif",
-   "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjIxeGdsc3QxdGRkaGY1aWxiejFxZTc0dHZqaG55cjV3aGR4MzI5NSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/13JipyoTNNvM2c/giphy.gif",
-    "https://media.giphy.com/media/l0amJzVHIAfl7jMDos/giphy.gif"  // 歡樂跳舞
+    "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif",
+    "https://media.giphy.com/media/3o7TKv6MgQfdSRT01G/giphy.gif",
+    "https://media.giphy.com/media/l2JIdnF6aJcNqyJXq/giphy.gif",
+    "https://media.giphy.com/media/blSTtZehjAZ8I/giphy.gif",
+    "https://media.giphy.com/media/11u7t453jrQxY4/giphy.gif",
+    "https://media.giphy.com/media/l0amJzVHIAfl7jMDos/giphy.gif"
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -34,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
         soundToggle.innerText = state.soundEnabled ? '🔊' : '🔇';
     });
     
-    // 初始化按鈕顯示
     document.getElementById('sound-toggle').innerText = state.soundEnabled ? '🔊' : '🔇';
 });
 
@@ -48,58 +44,45 @@ function loadNewLevel() {
     const header = document.querySelector('.header');
     const title = document.getElementById('level-title');
 
-    // 生成新的 3 題會話
     generateNewSession();
     
     header.classList.remove('boss-mode');
     title.innerText = `第 ${state.level} 關`;
     
-    // 顯示第一題
     renderQuestion(stage);
 }
 
-// ✨ 生成 3 題會話 (混合難度版 - 不會太難)
+// 生成 3 題會話 (混合難度版 & 嚴格防重複)
 function generateNewSession() {
+    // 1. 先過濾掉所有「已使用」的題目
     let available = triviaDB.filter(q => !state.usedQuestions.includes(q.id));
     
+    // 2. 如果題目不夠 3 題了（200題都做完了），則重置題庫
     if (available.length < 3) {
-        // 題庫不足，重置
+        alert("太強了！你已經做完所有題目！題庫將重置，開始第二輪挑戰！");
         state.usedQuestions = [];
         localStorage.setItem('atomic_used_q', '[]');
-        generateNewSession();
+        generateNewSession(); // 重新執行
         return;
     }
 
-    // 分離出簡單、中等、困難題
+    // 3. 分離難度
     let easy = available.filter(q => (q.difficulty || 0) === 0);
     let medium = available.filter(q => (q.difficulty || 0) === 1);
     let hard = available.filter(q => (q.difficulty || 0) >= 2);
 
     let sessionQuestions = [];
 
-    // 難度策略：根據等級配比
+    // 4. 根據等級配題
     if (state.level <= 5) {
-        // LV 1-5：2 簡單 + 1 中等 (新手保護期)
-        sessionQuestions = [
-            ...getRandom(easy, 2),
-            ...getRandom(medium, 1)
-        ];
+        sessionQuestions = [...getRandom(easy, 2), ...getRandom(medium, 1)];
     } else if (state.level <= 15) {
-        // LV 6-15：1 簡單 + 2 中等
-        sessionQuestions = [
-            ...getRandom(easy, 1),
-            ...getRandom(medium, 2)
-        ];
+        sessionQuestions = [...getRandom(easy, 1), ...getRandom(medium, 2)];
     } else {
-        // LV 16+：1 簡單 + 1 中等 + 1 困難
-        sessionQuestions = [
-            ...getRandom(easy, 1),
-            ...getRandom(medium, 1),
-            ...getRandom(hard, 1)
-        ];
+        sessionQuestions = [...getRandom(easy, 1), ...getRandom(medium, 1), ...getRandom(hard, 1)];
     }
     
-    // 如果湊不夠 3 題 (比如簡單題用完了)，就從剩餘題目裡隨機補
+    // 5. 補足題目 (如果某種難度缺題)
     if (sessionQuestions.length < 3) {
         let needed = 3 - sessionQuestions.length;
         let remaining = available.filter(q => !sessionQuestions.includes(q));
@@ -111,18 +94,15 @@ function generateNewSession() {
     state.sessionCorrect = 0;
 }
 
-// 輔助函數：隨機取 n 個
 function getRandom(arr, n) {
     let shuffled = [...arr].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, Math.min(n, arr.length));
 }
 
-// 顯示目前這一題
 function renderQuestion(container) {
     const q = state.currentSession[state.sessionProgress];
     const progress = state.sessionProgress + 1;
     
-    // 難度圖示
     let diffIcon = '🟢';
     if ((q.difficulty || 0) === 1) diffIcon = '🟡';
     if ((q.difficulty || 0) >= 2) diffIcon = '🔴';
@@ -143,49 +123,44 @@ function checkAns(user, ans) {
     const q = state.currentSession[state.sessionProgress];
     
     if(user === ans) {
-        // ✨ 全屏閃光特效 (綠色)
+        // ✨ 全屏閃光 (綠)
         document.body.style.backgroundColor = "#d1fae5"; 
         setTimeout(() => document.body.style.backgroundColor = "", 200); 
 
-        // 答對：寵物開心
         playSound('correct');
         setPetMood('happy');
         state.sessionCorrect++;
         
-        // 記錄已回答
-        if (q.dbId) {
-            state.usedQuestions.push(q.dbId);
-            localStorage.setItem('atomic_used_q', JSON.stringify(state.usedQuestions));
+        // ✨ 關鍵修正：使用 q.id 而不是 q.dbId
+        // 只有答對才記錄為「已使用」，確保不會再出現
+        if (q.id !== undefined) {
+            // 確保不重複添加
+            if (!state.usedQuestions.includes(q.id)) {
+                state.usedQuestions.push(q.id);
+                localStorage.setItem('atomic_used_q', JSON.stringify(state.usedQuestions));
+            }
         }
-        
-        // 顯示解析 (可選)
-        // alert(q.note); 
         
         state.sessionProgress++;
         updateProgressEmoji(); 
         
         if(state.sessionProgress >= 3) {
-            // 3 題全部答完！遊戲結束
             state.level++;
             localStorage.setItem('atomic_level', state.level);
-            
-            setTimeout(() => {
-                showGameEnd(true);
-            }, 600);
+            setTimeout(() => showGameEnd(true), 600);
         } else {
-            // 下一題
             setTimeout(() => renderQuestion(document.getElementById('game-stage')), 800);
         }
         
     } else {
-        // ✨ 全屏閃光特效 (紅色)
+        // ✨ 全屏閃光 (紅)
         document.body.style.backgroundColor = "#fee2e2"; 
         setTimeout(() => document.body.style.backgroundColor = "", 200);
 
-        // 答錯
         playSound('wrong');
         setPetMood('hurt');
         
+        // 答錯會顯示解析，但題目不會被標記為「已使用」，下次還有機會遇到（複習）
         setTimeout(() => {
             alert(`答錯了！\n正確答案是：${q.options[q.a]}\n解析：${q.note}`);
             setPetMood('normal');
@@ -199,19 +174,15 @@ function setPetMood(mood) {
     
     const avatar = document.getElementById('pet-avatar');
     avatar.classList.remove('pet-happy', 'pet-hurt');
-    
     void avatar.offsetWidth;
-
     if (mood === 'happy') avatar.classList.add('pet-happy');
     if (mood === 'hurt') avatar.classList.add('pet-hurt');
 }
 
-// ✨ 遊戲結束畫面 (辣妹跳舞版)
 function showGameEnd(success) {
     playSound('levelup');
     const emoji = state.sessionCorrect === 3 ? '🏆' : '🎉';
     
-    // ✨ 隨機選一張跳舞 GIF
     const randomGif = danceGifs[Math.floor(Math.random() * danceGifs.length)];
     
     const message = state.sessionCorrect === 3 
@@ -232,82 +203,61 @@ function showGameEnd(success) {
     `;
 }
 
-// 更新進度圖示
 function updateProgressEmoji() {
     const progressDiv = document.getElementById('progress-emoji');
     if (!progressDiv) return;
-    
-    // 計算目前進度百分比
     const progress = (state.sessionProgress / 3) * 100;
     
-    let emoji = '🐢'; // 0-33%
-    if (progress >= 33) emoji = '🐇'; // 33-66%
-    if (progress >= 66) emoji = '🚀'; // 66-100%
-    
+    let emoji = '🐢';
+    if (progress >= 33) emoji = '🐇';
+    if (progress >= 66) emoji = '🚀';
     progressDiv.innerText = emoji;
 }
 
-// 音效系統
 function playSound(type) {
     if (!state.soundEnabled) return;
-    
     try {
         const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        
         if (type === 'correct') {
             const osc = audioContext.createOscillator();
             const gain = audioContext.createGain();
             osc.connect(gain);
             gain.connect(audioContext.destination);
-            
             osc.frequency.setValueAtTime(800, audioContext.currentTime);
             osc.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
             gain.gain.setValueAtTime(0.3, audioContext.currentTime);
             gain.gain.setValueAtTime(0, audioContext.currentTime + 0.2);
-            
             osc.start(audioContext.currentTime);
             osc.stop(audioContext.currentTime + 0.2);
-        }
-        
-        else if (type === 'wrong') {
+        } else if (type === 'wrong') {
             const osc = audioContext.createOscillator();
             const gain = audioContext.createGain();
             osc.connect(gain);
             gain.connect(audioContext.destination);
-            
             osc.frequency.setValueAtTime(400, audioContext.currentTime);
             osc.frequency.setValueAtTime(300, audioContext.currentTime + 0.1);
             gain.gain.setValueAtTime(0.3, audioContext.currentTime);
             gain.gain.setValueAtTime(0, audioContext.currentTime + 0.2);
-            
             osc.start(audioContext.currentTime);
             osc.stop(audioContext.currentTime + 0.2);
-        }
-        
-        else if (type === 'levelup') {
+        } else if (type === 'levelup') {
             const osc = audioContext.createOscillator();
             const gain = audioContext.createGain();
             osc.connect(gain);
             gain.connect(audioContext.destination);
-            
             osc.frequency.setValueAtTime(600, audioContext.currentTime);
             osc.frequency.setValueAtTime(900, audioContext.currentTime + 0.15);
             osc.frequency.setValueAtTime(1200, audioContext.currentTime + 0.3);
             gain.gain.setValueAtTime(0.3, audioContext.currentTime);
             gain.gain.setValueAtTime(0, audioContext.currentTime + 0.4);
-            
             osc.start(audioContext.currentTime);
             osc.stop(audioContext.currentTime + 0.4);
         }
-    } catch(e) {
-        console.log('音效系統暫時無法使用');
-    }
+    } catch(e) {}
 }
 
-// 更新稱號名字和寵物狀態
 function updateStatus() {
     const rank = getRank(state.level);
-    
     document.getElementById('level-title').innerText = `第 ${state.level} 關`;
     document.getElementById('xp-display').innerText = `${rank} LV.${state.level}`;
     document.getElementById('xp-bar-fill').style.width = `100%`; 
@@ -347,11 +297,9 @@ function updateStatus() {
 
     petAvatar.innerText = icon;
     petStatus.innerText = `階段：${text}`;
-    
     updateProgressEmoji();
 }
 
-// 有趣的稱號名字
 function getRank(level) {
     if (level >= 15) return '神秘消失術大師';
     if (level >= 12) return '咖啡永遠不夠的人';
@@ -360,4 +308,3 @@ function getRank(level) {
     if (level >= 3) return '半桶水專家';
     return '剛出爐的吐司';
 }
-
