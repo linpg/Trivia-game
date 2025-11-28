@@ -6,11 +6,24 @@ let state = {
     sessionProgress: 0, // 目前進度 (0-2)
     sessionCorrect: 0, // 這一局答對幾題
     petMood: 'normal'
+    soundEnabled: JSON.parse(localStorage.getItem('atomic_sound') || 'true') // ✨ 新增：音效開關
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     updateStatus(); 
     loadNewLevel();
+    
+    // ✨ 新增：音效按鈕監聽
+    const soundToggle = document.getElementById('sound-toggle');
+    soundToggle.addEventListener('click', () => {
+        state.soundEnabled = !state.soundEnabled;
+        localStorage.setItem('atomic_sound', state.soundEnabled);
+        soundToggle.innerText = state.soundEnabled ? '🔊' : '🔇';
+    });
+    
+    // 初始化按鈕顯示
+    document.getElementById('sound-toggle').innerText = state.soundEnabled ? '🔊' : '🔇';
+});
 });
 
 function loadNewLevel() {
@@ -221,6 +234,8 @@ function getRank(level) {
 
 // ✨ 音效系統
 function playSound(type) {
+    // ✨ 新增：檢查是否關閉音效
+    if (!state.soundEnabled) return;
     // 檢查瀏覽器是否支持 Web Audio API
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     
@@ -273,5 +288,6 @@ function playSound(type) {
         osc.stop(audioContext.currentTime + 0.4);
     }
 }
+
 
 
