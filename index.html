@@ -8,20 +8,19 @@
 </head>
 <body>
     <div class="app-shell">
-          <!-- 頭部狀態列 -->
+        <!-- 頭部狀態列 -->
         <div class="header">
-            <div class="status-bar">
-                <!-- 左邊顯示關卡數 (字稍微大一點) -->
+            <div class="status-bar" style="display: flex; justify-content: space-between; align-items: center;">
+                <!-- 左邊顯示關卡數 -->
                 <span id="level-title" style="font-size: 1.2rem;">第 1 關</span>
                 
                 <!-- 中間顯示稱號與等級 -->
                 <span id="xp-display" style="font-size: 0.9rem; opacity: 0.9;">見習生 LV.1</span>
                 
                 <!-- 右邊音效按鈕 -->
-                <button id="sound-toggle" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 0; margin: 0;">🔊</button>
+                <button id="sound-toggle" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; padding: 0; margin: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">🔊</button>
             </div>
-            </div>
-             <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
                 <div class="progress-track" style="flex: 1;">
                     <div id="xp-bar-fill" class="progress-fill"></div>
                 </div>
@@ -29,10 +28,10 @@
             </div>
         </div>
 
-        <!-- ✨ 新增：寵物進化展示區 ✨ -->
+        <!-- ✨ 寵物進化展示區 ✨ -->
         <div id="pet-container">
-            <div id="pet-avatar">🥚</div>
-            <div id="pet-status">生命階段：神秘的蛋</div>
+            <div id="pet-avatar">🍞</div>
+            <div id="pet-status">階段：剛出爐的吐司</div>
         </div>
 
         <!-- 遊戲主舞台 -->
@@ -51,5 +50,3 @@
     <script src="app.js"></script>
 </body>
 </html>
-
-
