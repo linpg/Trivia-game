@@ -37,7 +37,7 @@ body {
 /* Header */
 .header {
     background: var(--primary);
-    padding: 20px 24px; /* 稍微縮小一點給寵物騰空間 */
+    padding: 20px 24px;
     color: white;
     border-radius: 0 0 24px 24px;
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
@@ -45,12 +45,12 @@ body {
     z-index: 10;
 }
 .header.boss-mode { background: var(--danger); }
-.status-bar { display: flex; justify-content: space-between; align-items: end; margin-bottom: 8px; }
+.status-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
 #level-title { font-size: 1.2rem; font-weight: 900; margin: 0; }
 .progress-track { background: rgba(0,0,0,0.2); height: 6px; border-radius: 3px; overflow: hidden; }
 .progress-fill { background: #fbbf24; height: 100%; width: 0%; transition: width 0.5s; }
 
-/* ✨ 寵物展示區 ✨ */
+/* 寵物展示區 */
 #pet-container {
     text-align: center;
     padding: 20px 0 10px 0;
@@ -103,7 +103,6 @@ body {
 }
 
 /* Animations */
-/* Animations */
 @keyframes breathe { 
     0%, 100% { transform: scale(1); } 
     50% { transform: scale(1.05); } 
@@ -118,7 +117,6 @@ body {
     to { transform: translateY(0); } 
 }
 
-/* ✨ 新增：開心跳躍 ✨ */
 @keyframes jump-happy {
     0% { transform: translateY(0) scale(1); }
     25% { transform: translateY(-20px) scale(1.1); }
@@ -127,7 +125,6 @@ body {
     100% { transform: translateY(0) scale(1); }
 }
 
-/* ✨ 新增：受傷顫抖 ✨ */
 @keyframes shake-hurt {
     0% { transform: translateX(0); }
     25% { transform: translateX(-10px) rotate(-5deg); }
@@ -136,7 +133,10 @@ body {
     100% { transform: translateX(0); }
 }
 
-/* 用來套用動畫的 class */
 .pet-happy { animation: jump-happy 0.8s ease-in-out !important; }
 .pet-hurt { animation: shake-hurt 0.5s ease-in-out !important; }
 
+@font-face {
+    font-family: 'FKGroteskNeue';
+    src: url('https://r2cdn.perplexity.ai/fonts/FKGroteskNeue.woff2') format('woff2');
+}
