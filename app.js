@@ -85,10 +85,13 @@ function checkAns(user, ans) {
     const q = state.currentSession[state.sessionProgress];
     
     if(user === ans) {
+        // ✨ 全屏閃光特效
+        document.body.style.backgroundColor = "#d1fae5"; // 瞬間變綠
+        setTimeout(() => document.body.style.backgroundColor = "", 200); // 0.2秒後變回來
+
         // 答對：寵物開心
         playSound('correct');
         setPetMood('happy');
-        state.sessionCorrect++;
         
         // 記錄已回答
         if (q.dbId) {
@@ -113,6 +116,10 @@ function checkAns(user, ans) {
         }
         
     } else {
+        // ✨ 全屏紅光特效
+        document.body.style.backgroundColor = "#fee2e2"; // 瞬間變紅
+        setTimeout(() => document.body.style.backgroundColor = "", 200);
+
         // 答錯
         playSound('wrong');
         setPetMood('hurt');
@@ -290,4 +297,5 @@ function getRank(level) {
     if (level >= 3) return '半桶水專家';
     return '剛出爐的吐司';
 }
+
 
