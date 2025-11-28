@@ -2,9 +2,10 @@ let state = {
     xp: parseInt(localStorage.getItem('atomic_xp') || 0),
     level: parseInt(localStorage.getItem('atomic_level') || 1),
     usedQuestions: JSON.parse(localStorage.getItem('atomic_used_q') || '[]'),
-    currentTask: null,
-    bossProgress: 0,
-    petMood: 'normal' // 新增：寵物心情 (normal, happy, hurt)
+    currentSession: [], // 這一局的 3 題
+    sessionProgress: 0, // 目前進度 (0-2)
+    sessionCorrect: 0, // 這一局答對幾題
+    petMood: 'normal'
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,7 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function loadNewLevel() {
-    // 換關卡時，把心情重置為 normal
     setPetMood('normal');
 
     const stage = document.getElementById('game-stage');
@@ -23,181 +23,186 @@ function loadNewLevel() {
     const header = document.querySelector('.header');
     const title = document.getElementById('level-title');
 
-    if (state.level % 50 === 0) {
-        state.currentTask = generateBossLevel(state.level);
-        state.bossProgress = 0;
-        header.classList.add('boss-mode');
-        title.innerText = "🔥 BOSS 關卡";
-        renderBoss(stage);
-        return;
-    } 
-
-    header.classList.remove('boss-mode');
-    title.innerText = `關卡 ${state.level}`;
+    // 生成新的 3 題會話
+    generateNewSession();
     
-    state.currentTask = getNextLevel(state.level, state.usedQuestions);
-    renderQuiz(state.currentTask, stage);
+    header.classList.remove('boss-mode');
+    title.innerText = `第 ${state.level} 關`;
+    
+    // 顯示第一題
+    renderQuestion(stage);
 }
 
-function renderQuiz(task, container) {
+// 生成 3 題會話
+function generateNewSession() {
+    const available = triviaDB.filter(q => !state.usedQuestions.includes(q.id));
+    
+    if (available.length < 3) {
+        // 題庫不足，重置並重新生成
+        state.usedQuestions = [];
+        localStorage.setItem('atomic_used_q', '[]');
+        generateNewSession();
+        return;
+    }
+
+    // 隨機抽 3 題
+    let shuffled = [...available].sort(()=>Math.random()-0.5);
+    state.currentSession = shuffled.slice(0, 3);
+    state.sessionProgress = 0;
+    state.sessionCorrect = 0;
+}
+
+// 顯示目前這一題
+function renderQuestion(container) {
+    const q = state.currentSession[state.sessionProgress];
+    const progress = state.sessionProgress + 1;
+    
     container.innerHTML = `
-        <div class="mode-icon">📚</div>
-        <p class="q-text">${task.q}</p>
-        <div class="options-grid">
-            ${task.options.map((o, i) => `<button class="btn-opt" onclick="checkAns(${i}, ${task.a})">${o}</button>`).join('')}
+        <div style="text-align: center; font-size: 0.9rem; color: #94a3b8; margin-bottom: 12px; font-weight: bold;">
+            進度: ${progress} / 3
         </div>
-    `;
-}
-
-function renderBoss(container) {
-    const q = state.currentTask.questions[state.bossProgress];
-    container.innerHTML = `
-        <div class="mode-icon">⚔️</div>
-        <div style="color:#ef4444; font-weight:bold; text-align:center; margin-bottom:10px">BOSS 進度: ${state.bossProgress+1}/5</div>
+        <div class="mode-icon">📚</div>
         <p class="q-text">${q.q}</p>
         <div class="options-grid">
-            ${q.options.map((o, i) => `<button class="btn-opt" onclick="checkBoss(${i}, ${q.a})">${o}</button>`).join('')}
+            ${q.options.map((o, i) => `<button class="btn-opt" onclick="checkAns(${i}, ${q.a})">${o}</button>`).join('')}
         </div>
     `;
-}
-
-function checkBoss(u, a) {
-    if(u === a) {
-        setPetMood('happy'); // 答對 Boss 題：開心
-        state.bossProgress++;
-        if(state.bossProgress >= 5) showFeedback(true, "擊敗 Boss！");
-        else setTimeout(() => renderBoss(document.getElementById('game-stage')), 800); // 延遲一點讓玩家看到開心動畫
-    } else {
-        setPetMood('hurt'); // 答錯 Boss 題：受傷
-        alert("被 Boss 打敗了！重來！");
-        state.bossProgress = 0;
-        renderBoss(document.getElementById('game-stage'));
-    }
 }
 
 function checkAns(user, ans) {
+    const q = state.currentSession[state.sessionProgress];
+    
     if(user === ans) {
         // 答對：寵物開心
         setPetMood('happy');
+        state.sessionCorrect++;
         
-        if (state.currentTask.dbId) {
-            state.usedQuestions.push(state.currentTask.dbId);
+        // 記錄已回答
+        if (q.dbId) {
+            state.usedQuestions.push(q.dbId);
             localStorage.setItem('atomic_used_q', JSON.stringify(state.usedQuestions));
         }
-        if (state.currentTask.reset) {
-            state.usedQuestions = [];
-            localStorage.setItem('atomic_used_q', '[]');
+        
+        state.sessionProgress++;
+        updateProgressEmoji(); // 更新進度圖示
+        
+        if(state.sessionProgress >= 3) {
+            // 3 題全部答完！遊戲結束
+            state.level++;
+            localStorage.setItem('atomic_level', state.level);
+            
+            setTimeout(() => {
+                showGameEnd(true);
+            }, 600);
+        } else {
+            // 下一題
+            setTimeout(() => renderQuestion(document.getElementById('game-stage')), 800);
         }
         
-        // 稍微延遲顯示結算，讓玩家能看到寵物跳起來
-        setTimeout(() => {
-            showFeedback(true, state.currentTask.note);
-        }, 600);
-        
     } else {
-        // 答錯：寵物受傷
+        // 答錯
         setPetMood('hurt');
         
-        // 震動一下後彈出警告
         setTimeout(() => {
-            alert("答錯了！寵物受傷了 😢\n再試一次！");
-            setPetMood('normal'); // 恢復正常讓玩家繼續
+            alert("這也能答錯？不會吧不會吧？！");
+            setPetMood('normal');
         }, 300);
     }
 }
 
-// ✨ 新增：控制寵物心情與動畫 ✨
 function setPetMood(mood) {
     state.petMood = mood;
-    updateStatus(); // 重新渲染寵物圖案
+    updateStatus(); 
     
     const avatar = document.getElementById('pet-avatar');
-    // 移除舊動畫
     avatar.classList.remove('pet-happy', 'pet-hurt');
     
-    // 強制觸發重繪 (Reflow) 以便重新播放動畫
     void avatar.offsetWidth;
 
-    // 加入新動畫
     if (mood === 'happy') avatar.classList.add('pet-happy');
     if (mood === 'hurt') avatar.classList.add('pet-hurt');
 }
 
-function showFeedback(success, note) {
-    state.xp += 20;
-    let levelUp = false;
-    if(state.xp >= 100) { 
-        state.xp %= 100; 
-        state.level++;
-        levelUp = true; 
-    }
-    
-    localStorage.setItem('atomic_xp', state.xp);
-    localStorage.setItem('atomic_level', state.level);
-    // 這裡不呼叫 updateStatus，因為我們想保留 'happy' 的表情直到按下下一關
-    // 但我們需要更新 XP 條文字，所以手動更新一下文字就好
-    document.getElementById('xp-display').innerText = `LV.${state.level}`;
-    document.getElementById('xp-bar-fill').style.width = `${state.xp}%`;
+// ✨ 新增：遊戲結束畫面
+function showGameEnd(success) {
+    const emoji = state.sessionCorrect === 3 ? '🏆' : '🎉';
+    const message = state.sessionCorrect === 3 
+        ? `3 都答對了！再試啊！`
+        : `答對 ${state.sessionCorrect} / 3`;
 
     const fb = document.getElementById('feedback');
     fb.style.display = 'block';
     fb.innerHTML = `
-        <div style="font-size:3rem">${levelUp ? '🆙' : '🎉'}</div>
-        <h3>${levelUp ? '升級啦！' : '挑戰成功！'}</h3>
-        <p>${note}</p>
-        <button class="btn-next" onclick="loadNewLevel()">下一關 ➡</button>
+        <div style="font-size:3rem">${emoji}</div>
+        <h3>遊戲結束！升到 LV.${state.level}</h3>
+        <p>${message}</p>
+        <button class="btn-next" onclick="loadNewLevel()">重新開始 🔄</button>
     `;
 }
 
+// ✨ 更新進度圖示
+function updateProgressEmoji() {
+    const progressDiv = document.getElementById('progress-emoji');
+    if (!progressDiv) return;
+    
+    // 計算目前進度百分比
+    const progress = (state.sessionProgress / 3) * 100;
+    
+    let emoji = '🐢'; // 0-33%
+    if (progress >= 33) emoji = '🐇'; // 33-66%
+    if (progress >= 66) emoji = '🚀'; // 66-100%
+    
+    progressDiv.innerText = emoji;
+}
+
+// ✨ 修改：更新稱號名字和寵物狀態
 function updateStatus() {
-    // 1. 計算玩家稱號
-    let rank = '剛出爐的吐司';
-    if (state.level >= 3) rank = '半桶水專家';
-    if (state.level >= 6) rank = '連 Wi-Fi 都連不上的人';
-    if (state.level >= 9) rank = '睡覺也能思考的人';
-    if (state.level >= 12) rank = '咖啡永遠不夠的人';
-    if (state.level >= 15) rank = '神秘消失術大師';
-
-    // 2. 更新文字顯示
-    // 左上角：顯示目前的關卡數
+    const rank = getRank(state.level);
+    
     document.getElementById('level-title').innerText = `第 ${state.level} 關`;
-    
-    // 右上角：顯示 稱號 + 等級 + XP
-    document.getElementById('xp-display').innerText = `${rank} LV.${state.level} (${state.xp}%)`;
-    
-    // 進度條
-    document.getElementById('xp-bar-fill').style.width = `${state.xp}%`;
+    document.getElementById('xp-display').innerText = `${rank} LV.${state.level}`;
+    document.getElementById('xp-bar-fill').style.width = `100%`; // 充滿進度條
 
-    // 3. 寵物進化邏輯 (這是剛剛寫好的，保持不變)
     const petAvatar = document.getElementById('pet-avatar');
     const petStatus = document.getElementById('pet-status');
+    
     let icon = '🥚';
     let text = '孵化中...';
 
-    if (state.level >= 3) { icon = '🦎'; text = '破殼而出'; }
-    if (state.level >= 6) { icon = '🦖'; text = '幼年期'; }
-    if (state.level >= 9) { icon = '🦕'; text = '青年期'; }
-    if (state.level >= 12) { icon = '🐊'; text = '成熟期'; }
-    if (state.level >= 15) { icon = '🦖'; text = '老年期'; }
-    if (state.level >= 18) { icon = '🐉'; text = '靈魂昇華'; }
-    if (state.level >= 21) { icon = '🐲'; text = '成為天使'; }
+    if (state.level >= 2) { icon = '🐣'; text = '破殼而出'; }
+    if (state.level >= 3) { icon = '🐥'; text = '幼年期'; }
+    if (state.level >= 5) { icon = '🐓'; text = '青年期'; }
+    if (state.level >= 8) { icon = '🦅'; text = '成熟期'; }
+    if (state.level >= 12) { icon = '🦉'; text = '老年期'; }
+    if (state.level >= 18) { icon = '👻'; text = '靈魂昇華'; }
+    if (state.level >= 25) { icon = '👼'; text = '成為天使'; }
 
-    // ✨ 心情覆蓋 (如果開心或受傷，暫時改變表情) ✨
+    // 心情覆蓋
     if (state.petMood === 'happy') {
-        // 開心時加愛心或笑臉
-        if (state.level < 3) icon = '✨🥗✨'; 
-        else if (state.level < 6) icon = '❤️🌮❤️';
-        else if (state.level < 9) icon = '🎵🍔🎵';
-        else icon += '🍱'; 
+        if (state.level < 2) icon = '✨🥚✨'; 
+        else if (state.level < 3) icon = '🐣❤️';
+        else if (state.level < 5) icon = '🐥🎵';
+        else icon += '🥰'; 
     } 
     else if (state.petMood === 'hurt') {
-        // 受傷時變暈眩或受傷
-        if (state.level < 3) icon = '🗡️💥';
-        else if (state.level < 6) icon = '🐛🍂';
-        else icon = '🦴👾🦴'; 
+        if (state.level < 2) icon = '🥚💥';
+        else if (state.level < 3) icon = '🐣💦';
+        else icon = '🤕'; 
     }
 
     petAvatar.innerText = icon;
     petStatus.innerText = `階段：${text}`;
+    
+    // 更新進度圖示
+    updateProgressEmoji();
 }
 
+// ✨ 有趣的稱號名字
+function getRank(level) {
+    if (level >= 15) return '神秘消失術大師';
+    if (level >= 12) return '咖啡永遠不夠的人';
+    if (level >= 9) return '睡覺也能思考的人';
+    if (level >= 6) return '連 Wi-Fi 都連不上的人';
+    if (level >= 3) return '半桶水專家';
+    return '剛出爐的吐司';
+}
