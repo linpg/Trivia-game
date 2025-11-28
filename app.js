@@ -5,15 +5,15 @@ let state = {
     currentSession: [], // 這一局的 3 題
     sessionProgress: 0, // 目前進度 (0-2)
     sessionCorrect: 0, // 這一局答對幾題
-    petMood: 'normal'
-    soundEnabled: JSON.parse(localStorage.getItem('atomic_sound') || 'true') // ✨ 新增：音效開關
+    petMood: 'normal',
+    soundEnabled: JSON.parse(localStorage.getItem('atomic_sound') || 'true') // 音效開關
 };
 
 document.addEventListener('DOMContentLoaded', () => {
     updateStatus(); 
     loadNewLevel();
     
-    // ✨ 新增：音效按鈕監聽
+    // ✨ 音效按鈕監聽
     const soundToggle = document.getElementById('sound-toggle');
     soundToggle.addEventListener('click', () => {
         state.soundEnabled = !state.soundEnabled;
@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // 初始化按鈕顯示
     document.getElementById('sound-toggle').innerText = state.soundEnabled ? '🔊' : '🔇';
-});
 });
 
 function loadNewLevel() {
@@ -74,7 +73,7 @@ function renderQuestion(container) {
         <div style="text-align: center; font-size: 0.9rem; color: #94a3b8; margin-bottom: 12px; font-weight: bold;">
             進度: ${progress} / 3
         </div>
-        <div class="mode-icon">📚</div>
+        <div class="mode-icon">🔥</div>
         <p class="q-text">${q.q}</p>
         <div class="options-grid">
             ${q.options.map((o, i) => `<button class="btn-opt" onclick="checkAns(${i}, ${q.a})">${o}</button>`).join('')}
@@ -85,9 +84,9 @@ function renderQuestion(container) {
 function checkAns(user, ans) {
     const q = state.currentSession[state.sessionProgress];
     
-      if(user === ans) {
+    if(user === ans) {
         // 答對：寵物開心
-        playSound('correct'); // ✨ 加這一行
+        playSound('correct');
         setPetMood('happy');
         state.sessionCorrect++;
         
@@ -114,9 +113,8 @@ function checkAns(user, ans) {
         }
         
     } else {
-       } else {
         // 答錯
-        playSound('wrong'); // ✨ 加這一行
+        playSound('wrong');
         setPetMood('hurt');
         
         setTimeout(() => {
@@ -139,9 +137,9 @@ function setPetMood(mood) {
     if (mood === 'hurt') avatar.classList.add('pet-hurt');
 }
 
-// ✨ 新增：遊戲結束畫面
+// ✨ 遊戲結束畫面
 function showGameEnd(success) {
-    playSound('levelup'); // ✨ 加這一行
+    playSound('levelup');
     const emoji = state.sessionCorrect === 3 ? '🏆' : '🎉';
     const message = state.sessionCorrect === 3 
         ? `3 都答對了！再試啊！`
@@ -153,7 +151,7 @@ function showGameEnd(success) {
         <div style="font-size:3rem">${emoji}</div>
         <h3>遊戲結束！升到 LV.${state.level}</h3>
         <p>${message}</p>
-        <button class="btn-next" onclick="loadNewLevel()">都答對了！再來啊！</button>
+        <button class="btn-next" onclick="loadNewLevel()">🤔都答對了！再試啊！</button>
     `;
 }
 
@@ -172,6 +170,68 @@ function updateProgressEmoji() {
     progressDiv.innerText = emoji;
 }
 
+// ✨ 音效系統
+function playSound(type) {
+    // 檢查是否關閉音效
+    if (!state.soundEnabled) return;
+    
+    try {
+        // 檢查瀏覽器是否支持 Web Audio API
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        if (type === 'correct') {
+            // 答對音效 - 開心的音調
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            osc.frequency.setValueAtTime(800, audioContext.currentTime);
+            osc.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gain.gain.setValueAtTime(0, audioContext.currentTime + 0.2);
+            
+            osc.start(audioContext.currentTime);
+            osc.stop(audioContext.currentTime + 0.2);
+        }
+        
+        else if (type === 'wrong') {
+            // 答錯音效 - 低沉的音調
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            osc.frequency.setValueAtTime(400, audioContext.currentTime);
+            osc.frequency.setValueAtTime(300, audioContext.currentTime + 0.1);
+            gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gain.gain.setValueAtTime(0, audioContext.currentTime + 0.2);
+            
+            osc.start(audioContext.currentTime);
+            osc.stop(audioContext.currentTime + 0.2);
+        }
+        
+        else if (type === 'levelup') {
+            // 升級音效 - 歡樂上升的音調
+            const osc = audioContext.createOscillator();
+            const gain = audioContext.createGain();
+            osc.connect(gain);
+            gain.connect(audioContext.destination);
+            
+            osc.frequency.setValueAtTime(600, audioContext.currentTime);
+            osc.frequency.setValueAtTime(900, audioContext.currentTime + 0.15);
+            osc.frequency.setValueAtTime(1200, audioContext.currentTime + 0.3);
+            gain.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gain.gain.setValueAtTime(0, audioContext.currentTime + 0.4);
+            
+            osc.start(audioContext.currentTime);
+            osc.stop(audioContext.currentTime + 0.4);
+        }
+    } catch(e) {
+        console.log('音效系統暫時無法使用');
+    }
+}
+
 // ✨ 修改：更新稱號名字和寵物狀態
 function updateStatus() {
     const rank = getRank(state.level);
@@ -183,7 +243,7 @@ function updateStatus() {
     const petAvatar = document.getElementById('pet-avatar');
     const petStatus = document.getElementById('pet-status');
     
-       let icon = '🍞';
+    let icon = '🍞';
     let text = '剛出爐的吐司';
 
     if (state.level >= 2) { icon = '🤨'; text = '有點懷疑人生'; }
@@ -214,7 +274,6 @@ function updateStatus() {
         else icon = '🤖💔'; 
     }
 
-
     petAvatar.innerText = icon;
     petStatus.innerText = `階段：${text}`;
     
@@ -231,63 +290,3 @@ function getRank(level) {
     if (level >= 3) return '半桶水專家';
     return '剛出爐的吐司';
 }
-
-// ✨ 音效系統
-function playSound(type) {
-    // ✨ 新增：檢查是否關閉音效
-    if (!state.soundEnabled) return;
-    // 檢查瀏覽器是否支持 Web Audio API
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
-    if (type === 'correct') {
-        // 答對音效 - 開心的音調
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        osc.connect(gain);
-        gain.connect(audioContext.destination);
-        
-        osc.frequency.setValueAtTime(800, audioContext.currentTime);
-        osc.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gain.gain.setValueAtTime(0, audioContext.currentTime + 0.2);
-        
-        osc.start(audioContext.currentTime);
-        osc.stop(audioContext.currentTime + 0.2);
-    }
-    
-    else if (type === 'wrong') {
-        // 答錯音效 - 低沉的音調
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        osc.connect(gain);
-        gain.connect(audioContext.destination);
-        
-        osc.frequency.setValueAtTime(400, audioContext.currentTime);
-        osc.frequency.setValueAtTime(300, audioContext.currentTime + 0.1);
-        gain.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gain.gain.setValueAtTime(0, audioContext.currentTime + 0.2);
-        
-        osc.start(audioContext.currentTime);
-        osc.stop(audioContext.currentTime + 0.2);
-    }
-    
-    else if (type === 'levelup') {
-        // 升級音效 - 歡樂上升的音調
-        const osc = audioContext.createOscillator();
-        const gain = audioContext.createGain();
-        osc.connect(gain);
-        gain.connect(audioContext.destination);
-        
-        osc.frequency.setValueAtTime(600, audioContext.currentTime);
-        osc.frequency.setValueAtTime(900, audioContext.currentTime + 0.15);
-        osc.frequency.setValueAtTime(1200, audioContext.currentTime + 0.3);
-        gain.gain.setValueAtTime(0.3, audioContext.currentTime);
-        gain.gain.setValueAtTime(0, audioContext.currentTime + 0.4);
-        
-        osc.start(audioContext.currentTime);
-        osc.stop(audioContext.currentTime + 0.4);
-    }
-}
-
-
-
