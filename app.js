@@ -12,10 +12,13 @@ let state = {
 // ✨ 進階玩法：隨機辣妹/慶祝 GIF 列表
 const danceGifs = [
     "https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif", // 復古迪斯可
-    "https://media.giphy.com/media/3o7TKv6MgQfdSRT01G/giphy.gif", // 歡呼
+    "https://media3.giphy.com/media/v1.Y2lkPTc5MGI3NjExczhrazZycGM5MG9vdGJteG00aWp0cjhpaG40eGplcmhyZ205MTF6ciZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/EbaEWv3icphQI/giphy.gif", // 歡呼
     "https://media.giphy.com/media/l2JIdnF6aJcNqyJXq/giphy.gif", // 派對
     "https://media.giphy.com/media/blSTtZehjAZ8I/giphy.gif",     // 碧昂絲
     "https://media.giphy.com/media/11u7t453jrQxY4/giphy.gif",     // 啦啦隊
+    "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExd3M1c2J4czRsb21qMHdkMDFmNHF1Nmc2cmU1Y3BuMzhjbmgxNTMzbiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/4j9XOYo6IVDK8/giphy.gif",  
+    "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2ZhMWZ2M24zMmFja2pwNTJhN2x3cDE0djFqZDh6dXFya2FkeTJncyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3UkqVq3F50bVCi9URl/giphy.gif",
+   "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjIxeGdsc3QxdGRkaGY1aWxiejFxZTc0dHZqaG55cjV3aGR4MzI5NSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/13JipyoTNNvM2c/giphy.gif",
     "https://media.giphy.com/media/l0amJzVHIAfl7jMDos/giphy.gif"  // 歡樂跳舞
 ];
 
@@ -357,3 +360,4 @@ function getRank(level) {
     if (level >= 3) return '半桶水專家';
     return '剛出爐的吐司';
 }
+
