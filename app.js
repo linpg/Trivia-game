@@ -118,7 +118,7 @@ function checkAns(user, ans) {
         setPetMood('hurt');
         
         setTimeout(() => {
-            alert("這也能答錯？不會吧不會吧？！");
+            alert("這也能答錯？可憐？！");
             setPetMood('normal');
         }, 300);
     }
@@ -290,3 +290,4 @@ function getRank(level) {
     if (level >= 3) return '半桶水專家';
     return '剛出爐的吐司';
 }
+
