@@ -166,29 +166,37 @@ function updateStatus() {
     const petAvatar = document.getElementById('pet-avatar');
     const petStatus = document.getElementById('pet-status');
     
-    let icon = '🥚';
-    let text = '孵化中...';
+       let icon = '🍞';
+    let text = '剛出爐的吐司';
 
-    if (state.level >= 2) { icon = '🐣'; text = '破殼而出'; }
-    if (state.level >= 3) { icon = '🐥'; text = '幼年期'; }
-    if (state.level >= 5) { icon = '🐓'; text = '青年期'; }
-    if (state.level >= 8) { icon = '🦅'; text = '成熟期'; }
-    if (state.level >= 12) { icon = '🦉'; text = '老年期'; }
-    if (state.level >= 18) { icon = '👻'; text = '靈魂昇華'; }
-    if (state.level >= 25) { icon = '👼'; text = '成為天使'; }
+    if (state.level >= 2) { icon = '🤨'; text = '有點懷疑人生'; }
+    if (state.level >= 3) { icon = '🧠🔥'; text = '腦子著火'; }
+    if (state.level >= 5) { icon = '📚🤓'; text = '書呆子進化'; }
+    if (state.level >= 8) { icon = '👔💼'; text = '上班族痛苦版'; }
+    if (state.level >= 12) { icon = '😵‍💫☕'; text = '咖啡中毒 無法自拔'; }
+    if (state.level >= 18) { icon = '🤖⚡'; text = '機器人失控'; }
+    if (state.level >= 25) { icon = '👽🌀'; text = '外星人來襲'; }
 
     // 心情覆蓋
     if (state.petMood === 'happy') {
-        if (state.level < 2) icon = '✨🥚✨'; 
-        else if (state.level < 3) icon = '🐣❤️';
-        else if (state.level < 5) icon = '🐥🎵';
-        else icon += '🥰'; 
+        if (state.level < 2) icon = '🍞🥳'; 
+        else if (state.level < 3) icon = '🤨🎊';
+        else if (state.level < 5) icon = '🧠💯';
+        else if (state.level < 8) icon = '📚🏆';
+        else if (state.level < 12) icon = '👔💪';
+        else if (state.level < 18) icon = '☕😍';
+        else icon = '🤖✨🚀'; 
     } 
     else if (state.petMood === 'hurt') {
-        if (state.level < 2) icon = '🥚💥';
-        else if (state.level < 3) icon = '🐣💦';
-        else icon = '🤕'; 
+        if (state.level < 2) icon = '🍞😭';
+        else if (state.level < 3) icon = '🤨😡';
+        else if (state.level < 5) icon = '🧠💥';
+        else if (state.level < 8) icon = '📚😭';
+        else if (state.level < 12) icon = '👔😤';
+        else if (state.level < 18) icon = '☕😩';
+        else icon = '🤖💔'; 
     }
+
 
     petAvatar.innerText = icon;
     petStatus.innerText = `階段：${text}`;
@@ -206,3 +214,4 @@ function getRank(level) {
     if (level >= 3) return '半桶水專家';
     return '剛出爐的吐司';
 }
+
