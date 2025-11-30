@@ -63,9 +63,9 @@ function renderQuestion(container) {
     const progress = state.sessionProgress + 1;
     const total = state.currentSession.length; // 總數為 30
     
-    let diffIcon = '🟢';
-    if ((q.difficulty || 0) === 1) diffIcon = '🟡';
-    if ((q.difficulty || 0) >= 2) diffIcon = '🔴';
+    let diffIcon = '💬';
+    if ((q.difficulty || 0) === 1) diffIcon = '👁️‍🗨️';
+    if ((q.difficulty || 0) >= 2) diffIcon = '‼️';
 
     container.innerHTML = `
         <div style="text-align: center; font-size: 1.1rem; color: #64748b; margin-bottom: 15px; font-weight: bold;">
@@ -231,3 +231,4 @@ function updateStatus() {
     document.getElementById('pet-status').innerText = '中職知識王挑戰';
     document.getElementById('xp-display').innerText = ``; // 清空舊的等級顯示
 }
+
